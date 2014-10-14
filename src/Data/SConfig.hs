@@ -1,5 +1,6 @@
 module Data.SConfig
-( parseConfig
+( readConfig
+, writeConfig
 , getValue
 , Config
 , Key
@@ -19,9 +20,15 @@ type Value = String
 -- | Parsed configuration. Basically a Map String String
 type Config = M.Map Key Value
 
+-- | Convert configuration to parseable string
+writeConfig :: Config -> String
+writeConfig cfg = concat
+                $ intersperse "\n"
+                $ map (\(key,value) -> key ++ "=" ++ value) $ M.toList cfg
+
 -- | Parse configuration
-parseConfig :: String -> Config
-parseConfig str = foldl readConfigLine M.empty --apply readConfigLine to every line
+readConfig :: String -> Config
+readConfig str = foldl readConfigLine M.empty --apply readConfigLine to every line
                       $ filter (elem '=') --make sure all lines are actual configuration lines
                       $ concatEscaped
                       $ filter (\x -> (not $ null x) && (take 1 x) /= "#") --remove comments & empty lines
