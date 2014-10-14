@@ -29,15 +29,8 @@ parseConfig str = foldl readConfigLine M.empty --apply readConfigLine to every l
 
 --inserts a parsed key-value pair into the Config accumulator
 readConfigLine :: Config -> String -> Config
-readConfigLine config str = M.insert
-                                (filter (/=' ') key) --spaces only cause errors.
-                                    value
-                                config
-    where (key,_:value) = splitAt
-                              ( fromJust $ --already checked that str contains '='
-                                    elemIndex '=' str
-                              )
-                              str
+readConfigLine config str = M.insert (filter (/=' ') key) value config
+    where (key,_:value) = break (=='=') str
 
 --concatenate two lines if the first ends with a backslash
 concatEscaped :: [String] -> [String]
